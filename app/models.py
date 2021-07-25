@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
 
@@ -33,3 +34,12 @@ class Bike(models.Model):
     
     def __str__(self):
         return f'{self.bike_model} ({self.plate_no}) [{self.bike_class} | {self.category}]'
+
+class Booking(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    bike = models.ForeignKey(Bike, on_delete=models.CASCADE)
+    check_in = models.DateTimeField()
+    check_out = models.DateTimeField()
+
+    def __str__(self):
+        return f'{self.user} has booked {self.bike} from {self.check_in.strftime("%d-%b-%Y %H:%M")} to {self.check_out.strftime("%d-%b-%Y %H:%M")}'
