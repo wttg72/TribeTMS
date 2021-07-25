@@ -1,4 +1,5 @@
 from django import forms
+from datetime import datetime
 
 class AvailabilityFrom(forms.Form):
     BIKE_CATEGORIES=(
