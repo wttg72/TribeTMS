@@ -7,6 +7,7 @@ class Bike(models.Model):
         ('CUB','Underbone'),
         ('SPO','Sport'),
         ('STR','Street'),
+        ('SCO','Scooter'),
     )
 
     BIKE_CLASS=(
@@ -27,8 +28,8 @@ class Bike(models.Model):
 
     plate_no = models.CharField(max_length=8, null=True)
     category = models.CharField(max_length=3, choices=BIKE_CATEGORIES, null=True)
-    bikeclass = models.CharField(max_length=2, choices=BIKE_CLASS, null=True)
-    bikename = models.CharField(max_length=12, choices=BIKE_NAME, null=True)
+    bike_class = models.CharField(max_length=2, choices=BIKE_CLASS, null=True)
+    Model = models.CharField(max_length=12, choices=BIKE_NAME, null=True)
     
     def __str__(self):
         return f'{self.number}. {self.bikeclass} {self.category} {self.bikename}'
