@@ -46,8 +46,9 @@
 
                 {% csrf_token %}
                 <h2>Are you sure you want to cancel this booking?</h2>
-                <h3>{{booking.bike.plate_no}} {{booking.get_bike_category}}</h3>
-                <h3>{{booking}}</h3>
+                <h3>{{booking.get_bike_model}} [{{booking.bike.plate_no}}]</h3>
+                <h3>From: {{booking.check_in}}</h3>
+                <h3>To: {{booking.check_out}}</h3>
 
                 <!-- Input Div -->
                 <div class="input-div">

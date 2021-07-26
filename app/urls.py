@@ -6,6 +6,6 @@ app_name='app'
 urlpatterns= [
     path('bike_list/', BikeListView, name='BikeListView'),
     path('booking_list/', BookingListView.as_view(), name='BookingListView'),
-    path('bike/<category>', BikeDetailView.as_view(), name='BikeDetailView'),
+    path('bike/<model>', BikeDetailView.as_view(), name='BikeDetailView'),
     path('booking/cancel/<pk>', CancelBookingView.as_view(), name='CancelBookingView')
 ]

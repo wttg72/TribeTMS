@@ -4,24 +4,20 @@ from django.views.generic import ListView, FormView, View, DeleteView
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import DeleteView
 from .models import Bike, Booking
-from .forms import AvailabilityFrom
+from .forms import AvailabilityForm
 from app.booking_functions.availability import check_availability
+from app.booking_functions.get_bike_model_url_list import get_bike_model_url_list
+from app.booking_functions.get_bike_info_human_format import get_bike_model_human_format
+from app.booking_functions.get_available_bikes import get_available_bikes
+from app.booking_functions.book_bike import book_bike
 
 # Create your views here.
 
 def BikeListView(request):
-    bike = Bike.objects.all()[0]
-    bike_categories = dict(bike.BIKE_CATEGORIES)
-    bike_values = bike_categories.values()
-    bike_list=[]
-    for bike_category in bike_categories:
-        bike = bike_categories.get(bike_category)
-        bike_url = reverse('app:BikeDetailView', kwargs={
-                            'category': bike_category})
-        bike_list.append((bike,bike_url))
-
+    bike_model_url_list =  get_bike_model_url_list()
+    
     context={
-        "bike_list": bike_list,
+        "bike_list": bike_model_url_list,
     }
 
     return render(request, 'bike_list_view.html', context)
@@ -39,47 +35,32 @@ class BookingListView(ListView):
 
 class BikeDetailView(View):
     def get(self, request, *args, **kwargs):
-        category = self.kwargs.get('category', None)
-        form = AvailabilityFrom()
-        bike_list = Bike.objects.filter(category=category)
-
-        if len(bike_list) > 0:
-            bike = bike_list[0]
-            bike_category = dict(bike.BIKE_CATEGORIES).get(bike.category, None)
+        model = self.kwargs.get('model', None)
+        bike_model_human_format = get_bike_model_human_format(model)
+        form = AvailabilityForm()
+        if bike_model_human_format is not None:
             context={
-                'bike_category': bike_category,
+                'bike_model': bike_model_human_format,
                 'form': form,
             }
             return render(request, 'bike_detail_view.html', context)
         else:
-            return HttpResponse('Category does not exist.')
+            return HttpResponse('Model does not exist.')
 
     def post(self, request, *args, **kwargs):
-        category = self.kwargs.get('category', None)
-        bike_list = Bike.objects.filter(category=category)
-        form =  AvailabilityFrom(request.POST)
-
+        model = self.kwargs.get('model', None)
+        
+        form =  AvailabilityForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            
-        available_bikes=[]
-        for bike in bike_list:
-            if check_availability(bike, data['check_in'], data['check_out']):
-                available_bikes.append(bike)
 
-        if len(available_bikes) > 0:
-            bike = available_bikes[0]
-            booking = Booking.objects.create(
-                user = self.request.user,
-                bike=bike,
-                check_in = data['check_in'],
-                check_out = data['check_out']
-            )
-            booking.save()
+        available_bikes = get_available_bikes(model, data['check_in'], data['check_out'])
+
+        if available_bikes is not None:
+            booking = book_bike(request, available_bikes[0], data['check_in'], data['check_out'])
             return HttpResponse(booking)
-        
         else:
-            return HttpResponse("All of this category of bikes are booked! Please try another category.")
+            return HttpResponse("All of this model of bikes are booked for the dates you have requested! Please try another model or change the dates!")
 
 class CancelBookingView(DeleteView):
     model = Booking

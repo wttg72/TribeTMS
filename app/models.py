@@ -18,7 +18,7 @@ class Bike(models.Model):
         ('2','Class 2'),
     )
 
-    BIKE_NAME=(
+    BIKE_MODELS=(
         ('Aerox','Yamaha Aerox 155'),
         ('Sniper','Yamaha Sniper T150'),
         ('FZ16','Yamaha FZ16'),
@@ -31,10 +31,10 @@ class Bike(models.Model):
     plate_no = models.CharField(max_length=8, null=True)
     category = models.CharField(max_length=3, choices=BIKE_CATEGORIES, null=True)
     bike_class = models.CharField(max_length=2, choices=BIKE_CLASS, null=True)
-    bike_model = models.CharField(max_length=12, choices=BIKE_NAME, null=True)
+    model = models.CharField(max_length=12, choices=BIKE_MODELS, null=True)
     
     def __str__(self):
-        return f'{self.bike_model} ({self.plate_no}) [{self.bike_class} | {self.category}]'
+        return f'{self.model} ({self.plate_no}) [{self.bike_class} | {self.category}]'
 
 class Booking(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -45,6 +45,11 @@ class Booking(models.Model):
     def __str__(self):
         return f'From: {self.check_in.strftime("%d-%b-%Y %H:%M")} To: {self.check_out.strftime("%d-%b-%Y %H:%M")}'
 
+    def get_bike_model(self):
+        bike_models = dict(self.bike.BIKE_MODELS)
+        bike_model = bike_models.get(self.bike.model)
+        return bike_model
+    
     def get_bike_category(self):
         bike_categories = dict(self.bike.BIKE_CATEGORIES)
         bike_category = bike_categories.get(self.bike.category)
