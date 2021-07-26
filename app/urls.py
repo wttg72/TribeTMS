@@ -1,11 +1,11 @@
 from django.urls import path
-from .views import BikeListView, BookingList, BookingView, BikeDetailView
+from .views import BikeListView, BookingListView, BikeDetailView, CancelBookingView
 
 app_name='app'
 
 urlpatterns= [
-    path('bike_list/', BikeListView, name='BikeList'),
-    path('booking_list/', BookingList.as_view(), name='BookingList'),
-    path('book/', BookingView.as_view(), name='BookingView'),
-    path('bike/<category>', BikeDetailView.as_view(), name='BikeDetailView')
+    path('bike_list/', BikeListView, name='BikeListView'),
+    path('booking_list/', BookingListView.as_view(), name='BookingListView'),
+    path('bike/<category>', BikeDetailView.as_view(), name='BikeDetailView'),
+    path('booking/cancel/<pk>', CancelBookingView.as_view(), name='CancelBookingView')
 ]
